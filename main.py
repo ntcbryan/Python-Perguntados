@@ -6,57 +6,97 @@ import random
 
 # Carregar o arquivo excel
 df = pd.read_excel('questions.xlsx')
+df2 = pd.read_excel('tipo_perguntas.xlsx') 
 
 #Pegar as perguntas aleatoriamente
 questions = df.sample(n=10).values.tolist()
+tipo_perguntas = df.sample(n=4).values.tolist()
+
+
+df3 = pd.DataFrame(questions, columns=["Pergunta", "opcao1", "opcao2", "opcao3", "opcao4", "resposta", "tipo_perguntas"])
+tipo_1_df = df3[df3['tipo_perguntas'] == 1]
+tipo_2_df = df3[df3['tipo_perguntas'] == 2]
+tipo_3_df = df3[df3['tipo_perguntas'] == 3]
+tipo_4_df = df3[df3['tipo_perguntas'] == 4]
+
+perguntas_tipo_1 = tipo_1_df.sample(n=2).values.tolist()
+perguntas_tipo_2 = tipo_2_df.sample(n=2).values.tolist()
+perguntas_tipo_3 = tipo_3_df.sample(n=2).values.tolist()
+perguntas_tipo_4 = tipo_4_df.sample(n=2).values.tolist()
 
 # variaveis globais
 score = 0
 current_questions = 0
 
-# funcao para exibir proxima pergunta
-#Essa funcao basicamente vai mudar a estrutura dos objetos que criamos la em baixo
-#Exemplo pega o text='' e muda para text='question'  
-def display_question():
-    question, option1, option2, option3, option4, answer = questions[current_questions]
-    # Define a pergunta da vez, mudando o text da nossa variavel la de baixo para receber o question como
+
+def display_types():
+    
+    questions_label.config(text="Qual tipo de pergunta? ")
+    
+    option1_btn.config(text="Entretenimento", state=tk.NORMAL, command=lambda:selecionar_tipo_1(perguntas_tipo_1))
+    option2_btn.config(text="Artes", state=tk.NORMAL, command=lambda:selecionar_tipo_1(perguntas_tipo_2))
+    option3_btn.config(text="Ciencia", state=tk.NORMAL, command=lambda:selecionar_tipo_1(perguntas_tipo_3))
+    option4_btn.config(text="Esportes", state=tk.NORMAL, command=lambda:selecionar_tipo_1(perguntas_tipo_4))
+
+
+def selecionar_tipo_1(perguntas_tipo_1):
+
+    question, option1, option2, option3, option4, answer, tipo = perguntas_tipo_1[current_questions]
     questions_label.config(text=question)
 
     option1_btn.config(text=option1, state=tk.NORMAL, command=lambda:check_answer(1))
-    option2_btn.config(text=option2, state=tk.NORMAL, command=lambda:check_answer(1))
-    option3_btn.config(text=option3, state=tk.NORMAL, command=lambda:check_answer(1))
-    option4_btn.config(text=option4, state=tk.NORMAL, command=lambda:check_answer(1))
-
+    option2_btn.config(text=option2, state=tk.NORMAL, command=lambda:check_answer(2))
+    option3_btn.config(text=option3, state=tk.NORMAL, command=lambda:check_answer(3))
+    option4_btn.config(text=option4, state=tk.NORMAL, command=lambda:check_answer(4))
+    
+    
     currect_answer.set(answer)
 
 
-# funcao para verificar a resposta
 def check_answer(answer):
-    global score, current_questions
+
 
     if answer == currect_answer.get():
-        score += 1
-
-    current_questions += 1
-
-    if current_questions < len(questions):
-        display_question()
+        show_result_correct()
+    
+        
     else:
-        show_result()
+        show_result_wrong(current_questions)
+       
+    
+    # if current_questions < 1:
+    #     display_types()
+    # else:
+    #     show_result()
 
-def show_result():
-    messagebox.showinfo("Quiz Finalizado", f"Parabéns! Voce completou o Quiz. \n\n Fontuação final: {score}")
+
+
+def show_result_correct():
+    current_questions+1
+    messagebox.showinfo("Resposta certa",f"Parabéns Resposta correta {current_questions}")
     option1_btn.config(state=tk.DISABLED)
     option2_btn.config(state=tk.DISABLED)
     option3_btn.config(state=tk.DISABLED)
     option4_btn.config(state=tk.DISABLED)
+
     play_again_btn.pack()
+
+
+
+def show_result_wrong(answer):
+    current_questions+1
+    messagebox.showinfo("Resposta errada",f"Resposta incorreta, a resposta certa é {answer}")
+    option1_btn.config(state=tk.DISABLED)
+    option2_btn.config(state=tk.DISABLED)
+    option3_btn.config(state=tk.DISABLED)
+    option4_btn.config(state=tk.DISABLED)
+
+    play_again_btn.pack()
+    
 
 #funcao para jogar novamente 
 def play_again():
-    global score, current_questions
-    score = 0
-    current_questions = 0
+
     random.shuffle(questions)
 
     option1_btn.config(state=tk.NORMAL)
@@ -65,10 +105,8 @@ def play_again():
     option4_btn.config(state=tk.NORMAL)
 
     play_again_btn.pack_forget()
+    display_types()
 
-
-
-#print(questions)
 
 
 #Configurando janela
@@ -88,7 +126,10 @@ janela.option_add('*Font', 'Arial')
 
 
 # Icon na tela
-app_icon =PhotoImage(file="icons8-quiz-100.png")
+
+app_icon =PhotoImage(file="perguntadoslogo.png")
+fator_reducao = 4
+app_icon = app_icon.subsample(fator_reducao, fator_reducao)
 app_label = tk.Label(janela, image=app_icon, bg=background_color)
 app_label.pack(pady=10)
 
@@ -118,6 +159,9 @@ play_again_btn = tk.Button(janela,command=play_again, text="Jogar novamente", wi
 
 
 
-display_question()
+display_types()
+#random.shuffle(questions)
+#print(len(perguntas_tipo_1))
 
+#print(tipo_1_df)
 janela.mainloop()
