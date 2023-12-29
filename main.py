@@ -73,7 +73,7 @@ def check_answer(answer):
 
 def show_result_correct():
     current_questions+1
-    messagebox.showinfo("Resposta certa",f"Parabéns Resposta correta {current_questions}")
+    messagebox.showinfo("Resposta certa",f"Parabéns Resposta correta")
     option1_btn.config(state=tk.DISABLED)
     option2_btn.config(state=tk.DISABLED)
     option3_btn.config(state=tk.DISABLED)
